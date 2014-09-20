@@ -35,6 +35,10 @@ struct sig_signal_context_s {
 	int ctx_id;
 };
 
+/* Predefined signal contexts */
+extern sig_signal_context_t sig_ctx_default;
+extern sig_signal_context_t sig_ctx_sys;
+
 struct sig_signal_s {
 	sig_signal_id_t signal_id;
 	sig_signal_object_t object;
