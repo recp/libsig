@@ -35,16 +35,18 @@ struct sig_signal_context_s {
   int ctx_id;
 };
 
+const sig_signal_context_t * sig_ctx_new();
+
 /* Predefined signal contexts */
-extern sig_signal_context_t sig_ctx_default;
-extern sig_signal_context_t sig_ctx_sys;
+extern const sig_signal_context_t * sig_ctx_default();
+extern const sig_signal_context_t * sig_ctx_sys();
 
 struct sig_signal_s {
   sig_signal_id_t signal_id;
   sig_signal_object_t object;
   sig_signal_context_t * context;
 #ifdef __cplusplus
-  sig_signal_s(sig_signal_id_t _signal_id)
+  sig_signal_s(sig_signal_id_t _signal_id, const sig_signal_context_t * context, const  sig_signal_object_t object)
     : signal_id(_signal_id)  { }
 #endif
 };
@@ -95,7 +97,7 @@ namespace sig {
     virtual attach_stream_base_t & operator << (sig_observer_cb_t cb) const;
     virtual attach_stream_base_t & operator >> (sig_observer_cb_t cb) const;
   };
-  
+
   struct attach_stream_signal_base_t {
     attach_stream_base_t operator [] (const char * signal) const;
     attach_stream_base_t operator [] (int signal) const;
