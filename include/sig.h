@@ -5,17 +5,17 @@
  * Full license can be found in the LICENSE file
  */
 
-#ifndef libsig_signal_h
-#define libsig_signal_h
+#ifndef __libsig__signal__h_
+#define __libsig__signal__h_
 
 #ifdef __cplusplus
-#include <functional>
+#  include <functional>
 #endif
 
 #ifdef __cplusplus
-#define __SIG_C_DECL extern "C"
+#  define __SIG_C_DECL extern "C"
 #else
-#define __SIG_C_DECL
+#  efine __SIG_C_DECL
 #endif
 
 typedef const void * const sig_signal_id_t;
@@ -38,7 +38,9 @@ struct sig_signal_s {
   sig_signal_object_t object;
   sig_signal_context_t * context;
 #ifdef __cplusplus
-  sig_signal_s(sig_signal_id_t _signal_id, const sig_signal_context_t * context, const  sig_signal_object_t object)
+  sig_signal_s(sig_signal_id_t _signal_id,
+               const sig_signal_context_t * context,
+               const  sig_signal_object_t object)
     : signal_id(_signal_id)  { }
 #endif
 };
@@ -50,9 +52,9 @@ typedef void (*sig_observer_cb)(const sig_signal_t * signal);
 #endif
 
 #ifdef __cplusplus
-#define SIG_CB_DEFINER(cb_type) const cb_type& /* Lvalue reference; TODO: This can be change  */
+#  define SIG_CB_DEFINER(cb_type) const cb_type& /* Lvalue reference; TODO: This can be change  */
 #else
-#define SIG_CB_DEFINER(cb_type) cb_type
+#  define SIG_CB_DEFINER(cb_type) cb_type
 #endif
 
 typedef SIG_CB_DEFINER(sig_observer_cb) sig_observer_cb_t;
@@ -85,28 +87,30 @@ __SIG_C_DECL void sig_fire_s(const char * signal, void * object);
 
 #ifdef __cplusplus
 namespace sig {
-  struct attach_stream_base_t {
-    virtual attach_stream_base_t & operator << (sig_observer_cb_t cb) const;
-    virtual attach_stream_base_t & operator >> (sig_observer_cb_t cb) const;
-  };
 
-  struct attach_stream_signal_base_t {
-    attach_stream_base_t operator [] (const char * signal) const;
-    attach_stream_base_t operator [] (int signal) const;
-  };
-
-  struct fire_stream_base_t {
-    fire_stream_base_t & operator << (void * object) const;
-  };
-
-  struct fire_stream_signal_base_t {
-    fire_stream_base_t operator [] (const char * signal) const;
-    fire_stream_base_t operator [] (int signal) const;
-  };
-
-  extern attach_stream_signal_base_t attach;
-  extern fire_stream_base_t fire;
+struct attach_stream_base_t {
+  virtual attach_stream_base_t & operator << (sig_observer_cb_t cb) const;
+  virtual attach_stream_base_t & operator >> (sig_observer_cb_t cb) const;
 };
+
+struct attach_stream_signal_base_t {
+  attach_stream_base_t operator [] (const char * signal) const;
+  attach_stream_base_t operator [] (int signal) const;
+};
+
+struct fire_stream_base_t {
+  fire_stream_base_t & operator << (void * object) const;
+};
+
+struct fire_stream_signal_base_t {
+  fire_stream_base_t operator [] (const char * signal) const;
+  fire_stream_base_t operator [] (int signal) const;
+};
+
+extern attach_stream_signal_base_t attach;
+extern fire_stream_base_t fire;
+
+}; // namespace sig
 #endif
 
-#endif
+#endif /* defined(__libsig__signal__h_) */
