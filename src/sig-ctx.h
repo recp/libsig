@@ -40,8 +40,6 @@ private:
 extern context_manager<int> __sig_def_ctx_mngr;
 extern context_manager<CStringPtr> __sig_def_ctx_mngr_s;
 
-//  template class context_manager<int>::add(int, sig_observer_cb_t) const;
-
 } // namespace sig
 
 #endif /* defined(__libsig__signal_context__h_) */
