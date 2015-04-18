@@ -15,7 +15,7 @@
 #ifdef __cplusplus
 #  define __SIG_C_DECL extern "C"
 #else
-#  efine __SIG_C_DECL
+#  define __SIG_C_DECL
 #endif
 
 typedef const void * const sig_signal_id_t;
@@ -24,7 +24,10 @@ typedef struct sig_signal_s sig_signal_t;
 typedef struct sig_signal_context_s sig_signal_context_t;
 
 struct sig_signal_context_s {
-  int ctx_id;
+  const int ctx_id;
+#ifdef __cplusplus
+  sig_signal_context_s(int id);
+#endif
 };
 
 const sig_signal_context_t * sig_ctx_new();
@@ -46,9 +49,9 @@ struct sig_signal_s {
 };
 
 #ifdef __cplusplus
-typedef std::function<void (const sig_signal_t * signal)> sig_observer_cb;
+typedef std::function<void (const sig_signal_t signal)> sig_observer_cb;
 #else
-typedef void (*sig_observer_cb)(const sig_signal_t * signal);
+typedef void (*sig_observer_cb)(const sig_signal_t signal);
 #endif
 
 #ifdef __cplusplus
