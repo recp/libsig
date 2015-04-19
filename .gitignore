@@ -9,7 +9,6 @@
 ipch/
 Debug/
 .DS_Store
-
 /aclocal.m4
 /ar-lib
 /autom4te.cache/
@@ -24,10 +23,12 @@ Debug/
 /ltmain.sh
 /missing
 /libtool
+/.libs/
 .deps/
 *.[oa]
 *.l[oa]
 Makefile
 Makefile.in
-
 m4/*.m4
+.buildstamp
+.dirstamp
