@@ -29,3 +29,5 @@ Debug/
 *.l[oa]
 Makefile
 Makefile.in
+
+m4/*.m4
