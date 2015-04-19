@@ -48,19 +48,11 @@ struct sig_signal_s {
 #endif
 };
 
-#ifdef __cplusplus
-typedef std::function<void (const sig_signal_t signal)> sig_observer_cb;
-#else
-typedef void (*sig_observer_cb)(const sig_signal_t signal);
-#endif
+typedef void (*sig_observer_cb_t)(const sig_signal_t signal);
 
 #ifdef __cplusplus
-#  define SIG_CB_DEFINER(cb_type) const cb_type& /* Lvalue reference; TODO: This can be change  */
-#else
-#  define SIG_CB_DEFINER(cb_type) cb_type
+typedef std::function<void (const sig_signal_t signal)> sig_observer_cb2_t;
 #endif
-
-typedef SIG_CB_DEFINER(sig_observer_cb) sig_observer_cb_t;
 
 #define SIG_STATUS_T int
 #define SIG_STATUS_SUCCESS 0
@@ -69,10 +61,11 @@ typedef SIG_CB_DEFINER(sig_observer_cb) sig_observer_cb_t;
 /**
  * Attach a non-function or member-function to event
  */
-__SIG_C_DECL  void sig_attach(int signal, sig_observer_cb_t cb);
+__SIG_C_DECL void sig_attach(int signal, sig_observer_cb_t cb);
 
 #ifdef __cplusplus
-void sig_attach(const char * signal, sig_observer_cb_t cb);
+void sig_attach(int signal, sig_observer_cb2_t cb);
+void sig_attach(const char * signal, sig_observer_cb2_t cb);
 #else
 __SIG_C_DECL void sig_attach_s(const char * signal, sig_observer_cb_t cb);
 #endif
@@ -92,8 +85,8 @@ __SIG_C_DECL void sig_fire_s(const char * signal, void * object);
 namespace sig {
 
 struct attach_stream_base_t {
-  virtual attach_stream_base_t & operator << (sig_observer_cb_t cb) const;
-  virtual attach_stream_base_t & operator >> (sig_observer_cb_t cb) const;
+  virtual attach_stream_base_t & operator << (sig_observer_cb2_t cb) const;
+  virtual attach_stream_base_t & operator >> (sig_observer_cb2_t cb) const;
 };
 
 struct attach_stream_signal_base_t {

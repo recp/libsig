@@ -48,7 +48,7 @@ namespace sig {
 
 template <typename T>
 context_manager<T>::sig_signal_req_t::sig_signal_req_t(T signal,
-                                                       sig_observer_cb_t cb)
+                                                       sig_observer_cb2_t cb)
   : m_signal_id(signal),
     m_cb(cb) { }
 
@@ -79,7 +79,7 @@ context_manager<T>::context_manager(const sig_signal_context_t * sig_ctx) {
 
 template <typename T>
 void
-context_manager<T>::add(T signal, sig_observer_cb_t cb) const {
+context_manager<T>::add(T signal, sig_observer_cb2_t cb) const {
   sig_signal_req_t sig_req(signal, cb);
   m_observers->push_back(sig_req);
 }

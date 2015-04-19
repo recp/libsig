@@ -12,7 +12,11 @@ __SIG_C_DECL void sig_attach(int signal, sig_observer_cb_t cb) {
   sig::__sig_def_ctx_mngr.add(signal, cb);
 }
 
-void sig_attach(const char * signal, sig_observer_cb_t cb) {
+void sig_attach(int signal, sig_observer_cb2_t cb) {
+  sig::__sig_def_ctx_mngr.add(signal, cb);
+}
+
+void sig_attach(const char * signal, sig_observer_cb2_t cb) {
   sig::__sig_def_ctx_mngr_s.add(signal, cb);
 }
 
