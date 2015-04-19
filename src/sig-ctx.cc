@@ -87,14 +87,14 @@ context_manager<T>::add(T signal, sig_observer_cb_t cb) const {
 template <typename T>
 void
 context_manager<T>::fire(T signal, void * object) const {
-  typename std::vector<sig_signal_req_t>:: iterator it = m_observers->template begin();
+  typename std::vector<sig_signal_req_t>::iterator it = m_observers->begin();
   for (; it != m_observers->end(); it++) {
-     decltype(*it) sig_req = *it;
+     sig_signal_req_t sig_req = *it;
      if (sig_req == signal) {
        sig_signal_t signal_object(nullptr, // TODO:
                                   m_ctx,
                                   object);
-       sig_req.m_cb(signal_object);
+       sig_req(signal_object);
      }
   }
 }
