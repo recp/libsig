@@ -59,7 +59,7 @@ context_manager<T>::sig_signal_req_t::
 operator()(_Types ... _Args) const {
   m_cb(_Args...);
 }
-  
+
 template <typename T>
 bool
 context_manager<T>::sig_signal_req_t::operator== (const T& r1) const {
@@ -91,7 +91,7 @@ context_manager<T>::fire(T signal, void * object) const {
   for (; it != m_observers->end(); it++) {
      sig_signal_req_t sig_req = *it;
      if (sig_req == signal) {
-       sig_signal_t signal_object(nullptr, // TODO:
+       sig_signal_t signal_object(object, // TODO:
                                   m_ctx,
                                   object);
        sig_req(signal_object);
