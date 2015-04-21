@@ -8,6 +8,7 @@
 #include "sig.h"
 #include "sig-ctx.h"
 
+#include <string.h>
 #include <vector>
 
 static int s_sig_context_last_id = 1000;
