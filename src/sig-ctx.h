@@ -26,8 +26,8 @@ public:
   const sig_signal_context_t * ctx() const;
 private:
   struct sig_signal_req_t {
-    const T m_signal_id;
-    const sig_observer_cb2_t m_cb;
+    T m_signal_id;
+    sig_observer_cb2_t m_cb;
 
     sig_signal_req_t(T signal, sig_observer_cb2_t cb);
     bool operator==(const T& r1) const;
