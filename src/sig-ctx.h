@@ -17,13 +17,13 @@ typedef const char * CStringPtr;
 template <typename T = int>
 class context_manager {
 public:
-  context_manager(const sig_signal_context_t * sig_ctx);
+  context_manager(const sig_context_t * sig_ctx);
   ~context_manager();
 
   void add(T signal, sig_observer_cb2_t cb) const;
   void fire(T signal, void * object) const;
 
-  const sig_signal_context_t * ctx() const;
+  const sig_context_t * ctx() const;
 private:
   struct sig_signal_req_t {
     T m_signal_id;
@@ -39,7 +39,7 @@ private:
   };
 
   std::vector<sig_signal_req_t> * m_observers;
-  const sig_signal_context_t * m_ctx;
+  const sig_context_t * m_ctx;
 };
 
 extern context_manager<int> __sig_def_ctx_mngr;

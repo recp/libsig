@@ -18,30 +18,30 @@ enum sig_reserved_context_id {
   kSigReservedContextId_Sys     = 1
 };
 
-sig_signal_context_s::sig_signal_context_s(int id) : ctx_id(id) { }
+sig_context_s::sig_context_s(int id) : ctx_id(id) { }
 
-const sig_signal_context_t *
+const sig_context_t *
 sig_ctx_default() {
-  static  sig_signal_context_t  * __sig_default_ctx;
+  static  sig_context_t  * __sig_default_ctx;
   if (!__sig_default_ctx) {
-    __sig_default_ctx = new sig_signal_context_t(kSigReservedContextId_Default);
+    __sig_default_ctx = new sig_context_t(kSigReservedContextId_Default);
   }
   return __sig_default_ctx;
 }
 
-const sig_signal_context_t *
+const sig_context_t *
 sig_ctx_sys() {
-  static  sig_signal_context_t  * __sig_sys_ctx;
+  static  sig_context_t  * __sig_sys_ctx;
   if (!__sig_sys_ctx) {
-    __sig_sys_ctx = new sig_signal_context_t(kSigReservedContextId_Sys);
+    __sig_sys_ctx = new sig_context_t(kSigReservedContextId_Sys);
   }
   return __sig_sys_ctx;
 }
 
-const sig_signal_context_t *
+const sig_context_t *
 sig_ctx_new() {
   int next_id = ++s_sig_context_last_id;
-  sig_signal_context_t * new_ctx = new sig_signal_context_t(next_id);
+  sig_context_t * new_ctx = new sig_context_t(next_id);
   return new_ctx;
 }
 
@@ -80,7 +80,7 @@ context_manager<CStringPtr>::sig_signal_req_t::operator==(const CStringPtr& r1) 
 }
 
 template <typename T>
-context_manager<T>::context_manager(const sig_signal_context_t * sig_ctx) {
+context_manager<T>::context_manager(const sig_context_t * sig_ctx) {
   m_observers = new std::vector<sig_signal_req_t>;
 }
 
@@ -107,7 +107,7 @@ context_manager<T>::fire(T signal, void * object) const {
 }
 
 template <typename T>
-const sig_signal_context_t *  context_manager<T>::ctx() const {
+const sig_context_t *  context_manager<T>::ctx() const {
   return m_ctx;
 }
 

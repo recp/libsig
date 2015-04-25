@@ -21,28 +21,28 @@
 typedef const void * const sig_signal_id_t;
 typedef void * sig_signal_object_t;
 typedef struct sig_signal_s sig_signal_t;
-typedef struct sig_signal_context_s sig_signal_context_t;
+typedef struct sig_context_s sig_context_t;
 
-struct sig_signal_context_s {
+struct sig_context_s {
   const int ctx_id;
 #ifdef __cplusplus
-  sig_signal_context_s(int id);
+  sig_context_s(int id);
 #endif
 };
 
-const sig_signal_context_t * sig_ctx_new();
+const sig_context_t * sig_ctx_new();
 
 /* Predefined signal contexts */
-extern const sig_signal_context_t * sig_ctx_default();
-extern const sig_signal_context_t * sig_ctx_sys();
+extern const sig_context_t * sig_ctx_default();
+extern const sig_context_t * sig_ctx_sys();
 
 struct sig_signal_s {
   sig_signal_id_t signal_id;
   sig_signal_object_t object;
-  const sig_signal_context_t * context;
+  const sig_context_t * context;
 #ifdef __cplusplus
   sig_signal_s(sig_signal_id_t _signal_id,
-               const sig_signal_context_t * _context,
+               const sig_context_t * _context,
                const sig_signal_object_t _object)
     : context(_context),
       signal_id(_signal_id),
@@ -66,7 +66,7 @@ typedef std::function<void (const sig_signal_t signal)> sig_observer_cb2_t;
 __SIG_C_DECL void sig_attach(int signal, sig_observer_cb_t cb);
 __SIG_C_DECL void sig_attachc(int signal,
                               sig_observer_cb_t cb,
-                              sig_signal_context_t * ctx);
+                              const sig_context_t * ctx);
 
 #ifdef __cplusplus
 // Default context
@@ -76,15 +76,15 @@ void sig_attach(const char * signal, sig_observer_cb2_t cb);
 // Attach by given context
 void sig_attach(int signal,
                 sig_observer_cb2_t cb,
-                sig_signal_context_t * ctx);
+                const sig_context_t * ctx);
 void sig_attach(const char * signal,
                 sig_observer_cb2_t cb,
-                sig_signal_context_t * ctx);
+                const sig_context_t * ctx);
 #else
 __SIG_C_DECL void sig_attach_s(const char * signal, sig_observer_cb_t cb);
 __SIG_C_DECL void sig_attachc_s(int signal,
                                 sig_observer_cb_t cb,
-                                sig_signal_context_t * ctx);
+                                const sig_context_t * ctx);
 #endif
 
 /**
@@ -93,18 +93,18 @@ __SIG_C_DECL void sig_attachc_s(int signal,
 __SIG_C_DECL void sig_fire(int signal, void * object);
 __SIG_C_DECL void sig_firec(int signal,
                             void * object,
-                            sig_signal_context_t * ctx);
+                            const sig_context_t * ctx);
 
 #ifdef __cplusplus
 void sig_fire(const char * signal, void * object);
 void sig_fire(const char * signal,
               void * object,
-              sig_signal_context_t * ctx);
+              sig_context_t * ctx);
 #else
 __SIG_C_DECL void sig_fire_s(const char * signal, void * object);
 __SIG_C_DECL void sig_firec_s(const char * signal,
                               void * object,
-                              sig_signal_context_t * ctx);
+                              const sig_context_t * ctx);
 #endif
 
 #ifdef __cplusplus
