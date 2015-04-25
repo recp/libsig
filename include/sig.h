@@ -64,23 +64,47 @@ typedef std::function<void (const sig_signal_t signal)> sig_observer_cb2_t;
  * Attach a non-function or member-function to event
  */
 __SIG_C_DECL void sig_attach(int signal, sig_observer_cb_t cb);
+__SIG_C_DECL void sig_attachc(int signal,
+                              sig_observer_cb_t cb,
+                              sig_signal_context_t * ctx);
 
 #ifdef __cplusplus
+// Default context
 void sig_attach(int signal, sig_observer_cb2_t cb);
 void sig_attach(const char * signal, sig_observer_cb2_t cb);
+
+// Attach by given context
+void sig_attach(int signal,
+                sig_observer_cb2_t cb,
+                sig_signal_context_t * ctx);
+void sig_attach(const char * signal,
+                sig_observer_cb2_t cb,
+                sig_signal_context_t * ctx);
 #else
 __SIG_C_DECL void sig_attach_s(const char * signal, sig_observer_cb_t cb);
+__SIG_C_DECL void sig_attachc_s(int signal,
+                                sig_observer_cb_t cb,
+                                sig_signal_context_t * ctx);
 #endif
 
 /**
  * Fire an event by given name and object
  */
 __SIG_C_DECL void sig_fire(int signal, void * object);
+__SIG_C_DECL void sig_firec(int signal,
+                            void * object,
+                            sig_signal_context_t * ctx);
 
 #ifdef __cplusplus
 void sig_fire(const char * signal, void * object);
+void sig_fire(const char * signal,
+              void * object,
+              sig_signal_context_t * ctx);
 #else
 __SIG_C_DECL void sig_fire_s(const char * signal, void * object);
+__SIG_C_DECL void sig_firec_s(const char * signal,
+                              void * object,
+                              sig_signal_context_t * ctx);
 #endif
 
 #ifdef __cplusplus
