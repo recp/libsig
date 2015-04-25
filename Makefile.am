@@ -7,7 +7,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -std=c++11                                             \
+AM_CPPFLAGS =                                                        \
               -I$(top_srcdir)/include                                \
               -I$(top_srcdir)/src
 
