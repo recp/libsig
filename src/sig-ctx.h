@@ -32,8 +32,10 @@ private:
     sig_signal_req_t(T signal, sig_observer_cb2_t cb);
     bool operator==(const T& r1) const;
 
-    template <typename ..._Types>
-    void operator()(_Types ... _Args) const;
+    void operator()(sig_signal_t s) const;
+
+//    template <typename ..._Types>
+//    void operator()(_Types ... _Args) const;
   };
 
   std::vector<sig_signal_req_t> * m_observers;

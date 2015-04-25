@@ -53,12 +53,18 @@ context_manager<T>::sig_signal_req_t::sig_signal_req_t(T signal,
   : m_signal_id(signal),
     m_cb(cb) { }
 
+//template <typename T>
+//template <typename ... _Types>
+//void
+//context_manager<T>::sig_signal_req_t::
+//operator()(_Types ... _Args) const {
+//  m_cb(_Args...);
+//}
+
 template <typename T>
-template <typename ... _Types>
 void
-context_manager<T>::sig_signal_req_t::
-operator()(_Types ... _Args) const {
-  m_cb(_Args...);
+context_manager<T>::sig_signal_req_t::operator()(sig_signal_t s) const {
+  m_cb(s);
 }
 
 template <typename T>
