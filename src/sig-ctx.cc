@@ -22,7 +22,7 @@ sig_context_s::sig_context_s(int id) : ctx_id(id) { }
 
 const sig_context_t *
 sig_ctx_default() {
-  static  sig_context_t  * __sig_default_ctx;
+  static  sig_context_t * __sig_default_ctx;
   if (!__sig_default_ctx) {
     __sig_default_ctx = new sig_context_t(kSigReservedContextId_Default);
   }
@@ -31,7 +31,7 @@ sig_ctx_default() {
 
 const sig_context_t *
 sig_ctx_sys() {
-  static  sig_context_t  * __sig_sys_ctx;
+  static  sig_context_t * __sig_sys_ctx;
   if (!__sig_sys_ctx) {
     __sig_sys_ctx = new sig_context_t(kSigReservedContextId_Sys);
   }
@@ -63,7 +63,7 @@ context_manager<T>::sig_signal_req_t::sig_signal_req_t(T signal,
 
 template <typename T>
 void
-context_manager<T>::sig_signal_req_t::operator()(sig_signal_t s) const {
+context_manager<T>::sig_signal_req_t::operator() (sig_signal_t s) const {
   m_cb(s);
 }
 
@@ -75,7 +75,8 @@ context_manager<T>::sig_signal_req_t::operator== (const T& r1) const {
 
 template < >
 bool
-context_manager<CStringPtr>::sig_signal_req_t::operator==(const CStringPtr& r1) const {
+context_manager<CStringPtr>::sig_signal_req_t::operator==
+  (const CStringPtr& r1) const {
   return strcmp(m_signal_id, r1) == 0;
 }
 
@@ -107,7 +108,8 @@ context_manager<T>::fire(T signal, void * object) const {
 }
 
 template <typename T>
-const sig_context_t *  context_manager<T>::ctx() const {
+const sig_context_t *
+context_manager<T>::ctx() const {
   return m_ctx;
 }
 
