@@ -3,6 +3,7 @@ libsig
 
 Signal/Event handling lib for C/C++
 
+[![Build Status](https://travis-ci.org/recp/libsig.svg?branch=master)](https://travis-ci.org/recp/libsig)
 
 #--This is still under development!--#
 
