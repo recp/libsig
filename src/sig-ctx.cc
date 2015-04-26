@@ -121,7 +121,7 @@ context_manager<T>::~context_manager() {
 
 // default context managers
 context_manager<int> __sig_def_ctx_mngr(sig_ctx_default());
-context_manager<CStringPtr> __sig_def_ctx_mngr_s(sig_ctx_sys());
+context_manager<CStringPtr> __sig_def_ctx_mngr_s(sig_ctx_default());
 
 // explicit instantiation
 template class context_manager<int>;
