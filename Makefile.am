@@ -17,7 +17,5 @@ include_HEADERS = include/sig.h
 
 lib_LTLIBRARIES = libsig.la
 libsig_la_LDFLAGS = -no-undefined -version-info 1:0:0
-libsig_la_SOURCES = src/sig-ctx.h                                    \
-                    src/sig.cc                                       \
-                    src/sig-ctx.cc
+libsig_la_SOURCES = src/sig.cc
 libsig_la_CXXFLAGS = $(AM_CPPFLAGS)
