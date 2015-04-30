@@ -24,8 +24,14 @@ struct sig_signal_req;
 unsigned int s_last_sig_id = 1;
 unsigned int s_sig_context_last_id = 1000;
 
+struct cmp_str {
+  bool operator()(char const *a, char const *b) const {
+    return std::strcmp(a, b) < 0;
+  }
+};
+
 std::vector<sig_signal_req *> signals_reqs;
-std::map<CStringPtr, unsigned int> string_map;
+std::map<CStringPtr, unsigned int, cmp_str> string_map;
 
 struct sig_signal_req {
   typedef sig_observer_cb2_t sig_cb_t;
