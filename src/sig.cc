@@ -254,7 +254,7 @@ sig_firec(int signal,
 void
 sig_fire(const char * signal,
          void * object,
-         sig_context_t * ctx) {
+         const sig_context_t * ctx) {
   sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
 }
 

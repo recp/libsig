@@ -126,7 +126,7 @@ __SIG_C_DECL void sig_firec(int signal,
 void sig_fire(const char * signal, void * object);
 void sig_fire(const char * signal,
               void * object,
-              sig_context_t * ctx);
+              const sig_context_t * ctx);
 #else
 __SIG_C_DECL void sig_fire_s(const char * signal, void * object);
 __SIG_C_DECL void sig_firec_s(const char * signal,
