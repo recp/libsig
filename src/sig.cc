@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <map>
+#include <string.h>
 
 namespace sig {
 
@@ -26,7 +27,7 @@ unsigned int s_sig_context_last_id = 1000;
 
 struct cmp_str {
   bool operator()(char const *a, char const *b) const {
-    return std::strcmp(a, b) < 0;
+    return strcmp(a, b) < 0;
   }
 };
 
