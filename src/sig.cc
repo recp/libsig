@@ -107,9 +107,10 @@ perform_attach(CStringPtr signal,
   sig::signals_reqs.push_back(sig_req);
 }
 
-void perform_fire(int signal,
-                  void * object,
-                  sig_context_t * ctx = sig_def_ctx) {
+void
+perform_fire(int signal,
+             void * object,
+             sig_context_t * ctx = sig_def_ctx) {
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
   for (; it != sig::signals_reqs.end(); it++) {
      sig_signal_req sig_req = **it;
@@ -124,9 +125,10 @@ void perform_fire(int signal,
   }
 }
 
-void perform_fire(CStringPtr signal,
-                  void * object,
-                  sig_context_t * ctx = sig_def_ctx) {
+void
+perform_fire(CStringPtr signal,
+             void * object,
+             sig_context_t * ctx = sig_def_ctx) {
   unsigned int signal_uid = get_mapped_uid(signal);
 
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
