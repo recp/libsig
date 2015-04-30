@@ -113,6 +113,7 @@ void perform_fire(int signal,
   for (; it != sig::signals_reqs.end(); it++) {
      sig_signal_req sig_req = **it;
      if (sig_req.req_type == SIG_REQ_TYPE_INT
+         && sig_req.ctx->ctx_id == ctx->ctx_id
          && sig_req == signal) {
        sig_signal_t signal_object(object,
                                   ctx,
@@ -131,6 +132,7 @@ void perform_fire(CStringPtr signal,
   for (; it != sig::signals_reqs.end(); it++) {
      sig_signal_req sig_req = **it;
      if (sig_req.req_type == SIG_REQ_TYPE_STR
+         && sig_req.ctx->ctx_id == ctx->ctx_id
          && sig_req == signal_uid) {
        sig_signal_t signal_object(object,
                                   ctx,
@@ -176,6 +178,7 @@ sig_ctx_new() {
   return new_ctx;
 }
 
+// default contexts
 __SIG_C_DECL void
 sig_attach(int signal, sig_observer_cb_t cb) {
   sig::perform_attach(signal, cb);
@@ -209,4 +212,54 @@ sig_fire(const char * signal, void * object) {
 __SIG_C_DECL void
 sig_fire_s(const char * signal, void * object) {
   sig::perform_fire(signal, object);
+}
+
+// custom contexts
+__SIG_C_DECL void
+sig_attachc(int signal,
+            sig_observer_cb_t cb,
+            const sig_context_t * ctx) {
+  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+}
+
+void
+sig_attach(int signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+}
+
+void
+sig_attach(const char * signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+}
+
+__SIG_C_DECL void
+sig_attachc_s(const char * signal,
+              sig_observer_cb_t cb,
+              const sig_context_t * ctx) {
+  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+}
+
+__SIG_C_DECL void
+sig_firec(int signal,
+          void * object,
+          const sig_context_t * ctx) {
+  sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
+}
+
+void
+sig_fire(const char * signal,
+         void * object,
+         sig_context_t * ctx) {
+  sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
+}
+
+__SIG_C_DECL void
+sig_firec_s(const char * signal,
+            void * object,
+            const sig_context_t * ctx) {
+  sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
 }

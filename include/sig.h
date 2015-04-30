@@ -82,7 +82,7 @@ void sig_attach(const char * signal,
                 const sig_context_t * ctx);
 #else
 __SIG_C_DECL void sig_attach_s(const char * signal, sig_observer_cb_t cb);
-__SIG_C_DECL void sig_attachc_s(int signal,
+__SIG_C_DECL void sig_attachc_s(const char * signal,
                                 sig_observer_cb_t cb,
                                 const sig_context_t * ctx);
 #endif
