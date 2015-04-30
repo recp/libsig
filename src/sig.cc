@@ -74,11 +74,12 @@ sig::sig_signal_req::operator()(sig_signal_t s) const {
 unsigned int
 get_mapped_uid(CStringPtr signal) {
   unsigned int signal_uid = 0;
-  if (string_map.find(signal) == string_map.end()) {
+  std::map<CStringPtr, unsigned int>::iterator it = string_map.find(signal);
+  if (it == string_map.end()) {
     signal_uid = ++s_last_sig_id;
     string_map.insert(std::make_pair(signal, signal_uid));
   } else {
-    signal_uid = string_map.at(signal);
+    signal_uid = it->second;
   }
   return signal_uid;
 }
