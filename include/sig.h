@@ -21,16 +21,18 @@ typedef struct sig_context_s sig_context_t;
 
 struct sig_context_s {
   const int ctx_id;
+  int status;
 #ifdef __cplusplus
   sig_context_s(int id);
 #endif
 };
 
-const sig_context_t * sig_ctx_new();
+__SIG_C_DECL const sig_context_t * sig_ctx_new();
+__SIG_C_DECL void sig_ctx_free(const sig_context_t * ctx);
 
 /* Predefined signal contexts */
-extern const sig_context_t * sig_ctx_default();
-extern const sig_context_t * sig_ctx_sys();
+__SIG_C_DECL const sig_context_t * sig_ctx_default();
+__SIG_C_DECL const sig_context_t * sig_ctx_sys();
 
 struct sig_signal_s {
   sig_signal_id_t signal_id;

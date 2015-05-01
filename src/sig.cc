@@ -121,6 +121,9 @@ void
 perform_attach(int signal,
                _FuncType cb,
                const sig_context_t * ctx = sig_def_ctx) {
+  if (ctx->status == 1)
+    return;
+
   sig::sig_signal_req * sig_req =
        new sig::sig_signal_req(SIG_REQ_TYPE_INT, ctx, signal, cb);
   sig::signals_reqs.push_back(sig_req);
@@ -131,6 +134,9 @@ void
 perform_attach(CStringPtr signal,
                _FuncType cb,
                const sig_context_t * ctx = sig_def_ctx) {
+  if (ctx->status == 1)
+    return;
+
   unsigned int signal_uid = get_mapped_uid(signal);
 
   sig::sig_signal_req * sig_req =
@@ -286,8 +292,14 @@ void
 perform_fire(int signal,
              void * object,
              const sig_context_t * ctx = sig_def_ctx) {
+  if (ctx->status == 1)
+    return;
+
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
   for (; it != sig::signals_reqs.end(); it++) {
+    if (ctx->status == 1)
+      break;
+
      sig_signal_req * sig_req = *it;
      if (sig_req->req_type == SIG_REQ_TYPE_INT
          && sig_req->ctx->ctx_id == ctx->ctx_id
@@ -304,10 +316,16 @@ void
 perform_fire(CStringPtr signal,
              void * object,
              const sig_context_t * ctx = sig_def_ctx) {
+  if (ctx->status == 1)
+    return;
+
   unsigned int signal_uid = get_mapped_uid(signal);
 
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
   for (; it != sig::signals_reqs.end(); it++) {
+    if (ctx->status == 1)
+      break;
+
      sig_signal_req * sig_req = *it;
      if (sig_req->req_type == SIG_REQ_TYPE_STR
          && sig_req->ctx->ctx_id == ctx->ctx_id
@@ -331,7 +349,7 @@ enum sig_reserved_context_id {
 };
 
 
-const sig_context_t *
+__SIG_C_DECL const sig_context_t *
 sig_ctx_default() {
   static  sig_context_t * __sig_default_ctx;
   if (!__sig_default_ctx) {
@@ -340,7 +358,7 @@ sig_ctx_default() {
   return __sig_default_ctx;
 }
 
-const sig_context_t *
+__SIG_C_DECL const sig_context_t *
 sig_ctx_sys() {
   static  sig_context_t * __sig_sys_ctx;
   if (!__sig_sys_ctx) {
@@ -349,11 +367,40 @@ sig_ctx_sys() {
   return __sig_sys_ctx;
 }
 
-const sig_context_t *
+__SIG_C_DECL const sig_context_t *
 sig_ctx_new() {
   int next_id = ++sig::s_sig_context_last_id;
   sig_context_t * new_ctx = new sig_context_t(next_id);
   return new_ctx;
+}
+
+__SIG_C_DECL
+void
+sig_ctx_free(const sig_context_t * ctx) {
+  // prevent users to free-ing reserved/pre-defined contexts
+  if (ctx == sig_ctx_sys()
+      || ctx == sig_ctx_default()
+      || ctx->ctx_id < 1000)
+    return;
+
+  sig_context_t * ctx_to_free = const_cast<sig_context_t* >(ctx);
+  ctx_to_free->status = 1;
+
+  std::vector<sig::sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig::sig_signal_req * sig_req = *it;
+
+     if (sig_req->ctx == ctx
+         && sig_req->ctx->ctx_id == ctx->ctx_id) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+
+  delete ctx;
 }
 
 // default contexts
