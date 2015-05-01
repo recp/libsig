@@ -16,7 +16,7 @@ namespace sig {
 #define SIG_REQ_TYPE_INT 0
 #define SIG_REQ_TYPE_STR 1
 
-#define sig_def_ctx const_cast<sig_context_t *>(sig_ctx_default())
+#define sig_def_ctx sig_ctx_default()
 
 typedef const char * CStringPtr;
 
@@ -40,19 +40,19 @@ struct sig_signal_req {
   typedef unsigned int            uid_t;
   typedef unsigned int            req_type_t;
 
-  uid_t           uid;
-  req_type_t      req_type;
-  sig_context_t * ctx;
-  sig_cb_t        cb;
-  sig_mem_cb_t  * mem_cb;
+  uid_t                 uid;
+  req_type_t            req_type;
+  sig_cb_t              cb;
+  sig_mem_cb_t        * mem_cb;
+  const sig_context_t * ctx;
 
   sig_signal_req(req_type_t req_type,
-                 sig_context_t * ctx,
+                 const sig_context_t * ctx,
                  uid_t _uid,
                  sig_cb_t _cb);
 
   sig_signal_req(req_type_t req_type,
-                 sig_context_t * ctx,
+                 const sig_context_t * ctx,
                  uid_t _uid,
                  sig_mem_cb_t * _cb);
 
@@ -63,7 +63,7 @@ struct sig_signal_req {
 };
 
 sig_signal_req::sig_signal_req(req_type_t _req_type,
-                               sig_context_t * _ctx,
+                               const sig_context_t * _ctx,
                                uid_t _uid,
                                sig_cb_t _cb)
   : req_type(_req_type),
@@ -73,7 +73,7 @@ sig_signal_req::sig_signal_req(req_type_t _req_type,
     mem_cb(NULL) { }
 
 sig_signal_req::sig_signal_req(req_type_t _req_type,
-                               sig_context_t * _ctx,
+                               const sig_context_t * _ctx,
                                uid_t _uid,
                                sig_mem_cb_t * _cb)
   : req_type(_req_type),
@@ -120,7 +120,7 @@ template <typename _FuncType>
 void
 perform_attach(int signal,
                _FuncType cb,
-               sig_context_t * ctx = sig_def_ctx) {
+               const sig_context_t * ctx = sig_def_ctx) {
   sig::sig_signal_req * sig_req =
        new sig::sig_signal_req(SIG_REQ_TYPE_INT, ctx, signal, cb);
   sig::signals_reqs.push_back(sig_req);
@@ -130,7 +130,7 @@ template <typename _FuncType>
 void
 perform_attach(CStringPtr signal,
                _FuncType cb,
-               sig_context_t * ctx = sig_def_ctx) {
+               const sig_context_t * ctx = sig_def_ctx) {
   unsigned int signal_uid = get_mapped_uid(signal);
 
   sig::sig_signal_req * sig_req =
@@ -141,7 +141,7 @@ perform_attach(CStringPtr signal,
 void
 perform_fire(int signal,
              void * object,
-             sig_context_t * ctx = sig_def_ctx) {
+             const sig_context_t * ctx = sig_def_ctx) {
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
   for (; it != sig::signals_reqs.end(); it++) {
      sig_signal_req sig_req = **it;
@@ -159,7 +159,7 @@ perform_fire(int signal,
 void
 perform_fire(CStringPtr signal,
              void * object,
-             sig_context_t * ctx = sig_def_ctx) {
+             const sig_context_t * ctx = sig_def_ctx) {
   unsigned int signal_uid = get_mapped_uid(signal);
 
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
@@ -258,61 +258,61 @@ __SIG_C_DECL void
 sig_attachc(int signal,
             sig_observer_cb_t cb,
             const sig_context_t * ctx) {
-  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+  sig::perform_attach(signal, cb, ctx);
 }
 
 void
 sig_attach(int signal,
            sig_observer_cb_t cb,
            const sig_context_t * ctx) {
-  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+  sig::perform_attach(signal, cb, ctx);
 }
 
 void
 sig_attach(int signal,
            sig_observer_cb2_t cb,
            const sig_context_t * ctx) {
-  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+  sig::perform_attach(signal, cb, ctx);
 }
 
 void
 sig_attach(const char * signal,
            sig_observer_cb_t cb,
            const sig_context_t * ctx) {
-  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+  sig::perform_attach(signal, cb, ctx);
 }
 
 void
 sig_attach(const char * signal,
            sig_observer_cb2_t cb,
            const sig_context_t * ctx) {
-  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+  sig::perform_attach(signal, cb, ctx);
 }
 
 __SIG_C_DECL void
 sig_attachc_s(const char * signal,
               sig_observer_cb_t cb,
               const sig_context_t * ctx) {
-  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+  sig::perform_attach(signal, cb, ctx);
 }
 
 __SIG_C_DECL void
 sig_firec(int signal,
           void * object,
           const sig_context_t * ctx) {
-  sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
+  sig::perform_fire(signal, object, ctx);
 }
 
 void
 sig_fire(const char * signal,
          void * object,
          const sig_context_t * ctx) {
-  sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
+  sig::perform_fire(signal, object, ctx);
 }
 
 __SIG_C_DECL void
 sig_firec_s(const char * signal,
             void * object,
             const sig_context_t * ctx) {
-  sig::perform_fire(signal, object, const_cast<sig_context_t *>(ctx));
+  sig::perform_fire(signal, object, ctx);
 }
