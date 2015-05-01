@@ -189,16 +189,19 @@ __SIG_C_DECL void sig_detachc_s(int signal,
  * Fire an event by given name and object
  */
 __SIG_C_DECL void sig_fire(int signal, void * object);
-__SIG_C_DECL void sig_firec(int signal,
-                            void * object,
-                            const sig_context_t * ctx);
 
 #ifdef __cplusplus
 void sig_fire(const char * signal, void * object);
+void sig_fire(int signal,
+              void * object,
+              const sig_context_t * ctx);
 void sig_fire(const char * signal,
               void * object,
               const sig_context_t * ctx);
 #else
+__SIG_C_DECL void sig_firec(int signal,
+                            void * object,
+                            const sig_context_t * ctx);
 __SIG_C_DECL void sig_fire_s(const char * signal, void * object);
 __SIG_C_DECL void sig_firec_s(const char * signal,
                               void * object,

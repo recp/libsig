@@ -547,6 +547,13 @@ sig_firec(int signal,
 }
 
 void
+sig_fire(int signal,
+         void * object,
+         const sig_context_t * ctx) {
+  sig::perform_fire(signal, object, ctx);
+}
+
+void
 sig_fire(const char * signal,
          void * object,
          const sig_context_t * ctx) {
