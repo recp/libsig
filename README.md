@@ -9,9 +9,9 @@ ligsig is a signal/event library for C and C++ which allows to handling
 signals/events like observer pattern. Member functions also
 can be used as callbacks.
 
-Each signal has a signal context which allows that signals can be use in their own
+Each signal has a signal context which allows that signals can be used in their own
  context.
-Also the system signals such as SIGKILL... can be observed in system context
+Also the system signals such as SIGPIPE... can be observed in system context
 (sig_sys_ctx) ).
 
 Predefined contexts:
@@ -100,6 +100,23 @@ sig::detach["signal_name"] >> fn_callback1 >> fn_callback2 ...;
 
 /* Fire (trigger) a signal */
 sig:fire["signal_name"] << (void *)"Signal object (void *)";
+```
+
+## Build
+
+### Unix / Macintosh 
+
+```text
+$ sh autogen.sh
+$ ./configure
+$ make
+$ [sudo] make install
+```
+
+### Windows
+
+```text
+TODO
 ```
 
 ###Sample###
