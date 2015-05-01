@@ -139,19 +139,115 @@ perform_attach(CStringPtr signal,
 }
 
 void
+perform_detach(int signal,
+               sig_observer_cb_t cb,
+               const sig_context_t * ctx = sig_def_ctx) {
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig_signal_req * sig_req = *it;
+     if (!sig_req->cb)
+       continue;
+
+     if (sig_req->req_type == SIG_REQ_TYPE_INT
+         && sig_req->ctx->ctx_id == ctx->ctx_id
+         && *sig_req == signal
+         && sig_req->cb == cb) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+}
+
+void
+perform_detach(int signal,
+               sig_observer_cb2_t cb,
+               const sig_context_t * ctx = sig_def_ctx) {
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig_signal_req * sig_req = *it;
+     if (!sig_req->mem_cb)
+       continue;
+
+     if (sig_req->req_type == SIG_REQ_TYPE_INT
+         && sig_req->ctx->ctx_id == ctx->ctx_id
+         && *sig_req == signal
+         && *sig_req->mem_cb == cb) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+}
+
+void
+perform_detach(CStringPtr signal,
+               sig_observer_cb_t cb,
+               const sig_context_t * ctx = sig_def_ctx) {
+  unsigned int signal_uid = get_mapped_uid(signal);
+
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig_signal_req * sig_req = *it;
+     if (!sig_req->cb)
+       continue;
+
+     if (sig_req->req_type == SIG_REQ_TYPE_STR
+         && sig_req->ctx->ctx_id == ctx->ctx_id
+         && *sig_req == signal_uid
+         && sig_req->cb == cb) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+}
+
+void
+perform_detach(CStringPtr signal,
+               sig_observer_cb2_t cb,
+               const sig_context_t * ctx = sig_def_ctx) {
+  unsigned int signal_uid = get_mapped_uid(signal);
+
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig_signal_req * sig_req = *it;
+     if (!sig_req->mem_cb) // prevent comparing fn-ptr and mem-fn-ptr
+       continue;
+
+     if (sig_req->req_type == SIG_REQ_TYPE_STR
+         && sig_req->ctx->ctx_id == ctx->ctx_id
+         && *sig_req == signal_uid
+         && *sig_req->mem_cb == cb) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+}
+
+void
 perform_fire(int signal,
              void * object,
              const sig_context_t * ctx = sig_def_ctx) {
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
   for (; it != sig::signals_reqs.end(); it++) {
-     sig_signal_req sig_req = **it;
-     if (sig_req.req_type == SIG_REQ_TYPE_INT
-         && sig_req.ctx->ctx_id == ctx->ctx_id
-         && sig_req == signal) {
+     sig_signal_req * sig_req = *it;
+     if (sig_req->req_type == SIG_REQ_TYPE_INT
+         && sig_req->ctx->ctx_id == ctx->ctx_id
+         && *sig_req == signal) {
        sig_signal_t signal_object(object,
                                   ctx,
                                   object);
-       sig_req(signal_object);
+       (*sig_req)(signal_object);
      }
   }
 }
@@ -164,14 +260,14 @@ perform_fire(CStringPtr signal,
 
   std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
   for (; it != sig::signals_reqs.end(); it++) {
-     sig_signal_req sig_req = **it;
-     if (sig_req.req_type == SIG_REQ_TYPE_STR
-         && sig_req.ctx->ctx_id == ctx->ctx_id
-         && sig_req == signal_uid) {
+     sig_signal_req * sig_req = *it;
+     if (sig_req->req_type == SIG_REQ_TYPE_STR
+         && sig_req->ctx->ctx_id == ctx->ctx_id
+         && *sig_req == signal_uid) {
        sig_signal_t signal_object(object,
                                   ctx,
                                   object);
-       sig_req(signal_object);
+       (*sig_req)(signal_object);
      }
   }
 }
@@ -213,6 +309,9 @@ sig_ctx_new() {
 }
 
 // default contexts
+
+// attach
+
 __SIG_C_DECL void
 sig_attach(int signal, sig_observer_cb_t cb) {
   sig::perform_attach(signal, cb);
@@ -238,6 +337,8 @@ sig_attach_s(const char * signal, sig_observer_cb_t cb) {
   sig::perform_attach(signal, cb);
 }
 
+// fire
+
 __SIG_C_DECL void
 sig_fire(int signal, void * object) {
   sig::perform_fire(signal, object);
@@ -253,7 +354,37 @@ sig_fire_s(const char * signal, void * object) {
   sig::perform_fire(signal, object);
 }
 
+// detach
+
+__SIG_C_DECL void
+sig_detach(int signal, sig_observer_cb_t cb) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(int signal, sig_observer_cb2_t cb) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(const char * signal, sig_observer_cb_t cb) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(const char * signal, sig_observer_cb2_t cb) {
+  sig::perform_detach(signal, cb);
+}
+
+__SIG_C_DECL void
+sig_detach_s(const char * signal, sig_observer_cb_t cb) {
+  sig::perform_detach(signal, cb);
+}
+
 // custom contexts
+
+// attach
+
 __SIG_C_DECL void
 sig_attachc(int signal,
             sig_observer_cb_t cb,
@@ -296,6 +427,8 @@ sig_attachc_s(const char * signal,
   sig::perform_attach(signal, cb, ctx);
 }
 
+// fire
+
 __SIG_C_DECL void
 sig_firec(int signal,
           void * object,
@@ -315,4 +448,48 @@ sig_firec_s(const char * signal,
             void * object,
             const sig_context_t * ctx) {
   sig::perform_fire(signal, object, ctx);
+}
+
+// detach
+
+__SIG_C_DECL void
+sig_detachc(int signal,
+            sig_observer_cb_t cb,
+            const sig_context_t * ctx) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(int signal,
+           sig_observer_cb_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(int signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(const char * signal,
+           sig_observer_cb_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(const char * signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_detach(signal, cb);
+}
+
+__SIG_C_DECL void
+sig_detachc_s(int signal,
+              sig_observer_cb_t cb,
+              const sig_context_t * ctx) {
+  sig::perform_detach(signal, cb);
 }

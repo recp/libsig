@@ -135,23 +135,30 @@ __SIG_C_DECL void sig_attachc_s(const char * signal,
  * Detach a non-function or member-function to event
  */
 __SIG_C_DECL void sig_detach(int signal, sig_observer_cb_t cb);
-__SIG_C_DECL void sig_detachc(int signal,
-                              sig_observer_cb_t cb,
-                              const sig_context_t * ctx);
 
 #ifdef __cplusplus
 // Default context
 void sig_detach(int signal, sig_observer_cb2_t cb);
+void sig_detach(const char * signal, sig_observer_cb_t cb);
 void sig_detach(const char * signal, sig_observer_cb2_t cb);
 
 // Default by given context
+void sig_detach(int signal,
+                sig_observer_cb_t cb,
+                const sig_context_t * ctx);
 void sig_detach(int signal,
                 sig_observer_cb2_t cb,
                 const sig_context_t * ctx);
 void sig_detach(const char * signal,
                 sig_observer_cb2_t cb,
                 const sig_context_t * ctx);
+void sig_detach(const char * signal,
+                sig_observer_cb2_t cb,
+                const sig_context_t * ctx);
 #else
+__SIG_C_DECL void sig_detachc(int signal,
+                              sig_observer_cb_t cb,
+                              const sig_context_t * ctx);
 __SIG_C_DECL void sig_detach_s(const char * signal, sig_observer_cb_t cb);
 __SIG_C_DECL void sig_detachc_s(int signal,
                                 sig_observer_cb_t cb,
