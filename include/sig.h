@@ -137,6 +137,7 @@ __SIG_C_DECL void sig_attachc_s(const char * signal,
 __SIG_C_DECL void sig_detach(int signal, sig_observer_cb_t cb);
 
 #ifdef __cplusplus
+
 // Default context
 void sig_detach(int signal, sig_observer_cb2_t cb);
 void sig_detach(const char * signal, sig_observer_cb_t cb);
@@ -155,6 +156,23 @@ void sig_detach(const char * signal,
 void sig_detach(const char * signal,
                 sig_observer_cb2_t cb,
                 const sig_context_t * ctx);
+
+// Detach all observer from the object/instance
+// This can be useful when the object will be free-ing
+void sig_detach(void * observer);
+void sig_detach(void * observer,
+                const sig_context_t * ctx);
+
+// Detach all observers by given signal from the object/instance
+void sig_detach(int signal, void * observer);
+void sig_detach(const char * signal, void * observer);
+void sig_detach(int signal,
+                void * observer,
+                const sig_context_t * ctx);
+void sig_detach(int signal,
+                void * observer,
+                const sig_context_t * ctx);
+
 #else
 __SIG_C_DECL void sig_detachc(int signal,
                               sig_observer_cb_t cb,

@@ -235,6 +235,54 @@ perform_detach(CStringPtr signal,
 }
 
 void
+perform_detach_memfn(void * observer,
+                     int signal = 0,
+                     const sig_context_t * ctx = NULL) {
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig_signal_req * sig_req = *it;
+     if (!sig_req->mem_cb)
+       continue;
+
+     if (sig_req->mem_cb->get_obj_addr() == observer
+         && sig_req->req_type == SIG_REQ_TYPE_INT
+         && (ctx == NULL || sig_req->ctx->ctx_id == ctx->ctx_id)
+         && (signal == 0 || *sig_req == signal)) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+}
+
+void
+perform_detach_memfn2(void * observer,
+                      CStringPtr signal,
+                      const sig_context_t * ctx = NULL) {
+  unsigned int signal_uid = get_mapped_uid(signal);
+
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+     sig_signal_req * sig_req = *it;
+     if (!sig_req->mem_cb)
+       continue;
+
+     if (sig_req->mem_cb->get_obj_addr() == observer
+         && sig_req->req_type == SIG_REQ_TYPE_STR
+         && (ctx == NULL || sig_req->ctx->ctx_id == ctx->ctx_id)
+         && *sig_req == signal_uid) {
+
+        // free resources
+        delete sig_req;
+        sig::signals_reqs.erase(it);
+        it--;
+     }
+  }
+}
+
+void
 perform_fire(int signal,
              void * object,
              const sig_context_t * ctx = sig_def_ctx) {
@@ -381,6 +429,21 @@ sig_detach_s(const char * signal, sig_observer_cb_t cb) {
   sig::perform_detach(signal, cb);
 }
 
+void
+sig_detach(void * observer) {
+  sig::perform_detach_memfn(observer);
+}
+
+void
+sig_detach(int signal, void * observer) {
+  sig::perform_detach_memfn(observer, signal);
+}
+
+void
+sig_detach(const char * signal, void * observer) {
+  sig::perform_detach_memfn2(observer, signal);
+}
+
 // custom contexts
 
 // attach
@@ -492,4 +555,24 @@ sig_detachc_s(int signal,
               sig_observer_cb_t cb,
               const sig_context_t * ctx) {
   sig::perform_detach(signal, cb);
+}
+
+void
+sig_detach(void * observer,
+           const sig_context_t * ctx) {
+  sig::perform_detach_memfn(observer, 0, ctx);
+}
+
+void 
+sig_detach(int signal,
+           void * observer,
+           const sig_context_t * ctx) {
+  sig::perform_detach_memfn(observer, signal, ctx);
+}
+
+void
+sig_detach(const char * signal,
+           void * observer,
+           const sig_context_t * ctx) {
+  sig::perform_detach_memfn2(observer, signal, ctx);
 }
