@@ -9,10 +9,6 @@
 #define __libsig__signal__h_
 
 #ifdef __cplusplus
-#  include <functional>
-#endif
-
-#ifdef __cplusplus
 #  define __SIG_C_DECL extern "C"
 #else
 #  define __SIG_C_DECL
@@ -50,37 +46,85 @@ struct sig_signal_s {
 #endif
 };
 
-typedef void (*sig_observer_cb_t)(const sig_signal_t signal);
-
-#ifdef __cplusplus
-typedef std::function<void (const sig_signal_t signal)> sig_observer_cb2_t;
-#endif
-
 #define SIG_STATUS_T int
 #define SIG_STATUS_SUCCESS 0
 #define SIG_STATUS_FAILURE 1
+
+#ifdef __cplusplus
+struct sig_mem_observer_base_t {
+  virtual void operator()(const sig_signal_t signal) const = 0;
+  virtual bool operator==(sig_mem_observer_base_t * o) const = 0;
+  virtual void * get_obj_addr() const = 0;
+  virtual ~sig_mem_observer_base_t() { };
+};
+
+template <typename T>
+sig_mem_observer_base_t *
+sig_make_mem_observer(T * inst, void (T::*memFn)(const sig_signal_t signal)) {
+  struct sig_mem_observer_t : public sig_mem_observer_base_t {
+    T * m_inst;
+
+    void (T::*m_cb)(const sig_signal_t signal);
+    void * get_obj_addr() const {
+      return m_inst;
+    }
+
+    void operator()(const sig_signal_t signal) const {
+      (m_inst->*m_cb)(signal);
+    }
+
+    bool operator==(sig_mem_observer_base_t * o) const {
+      sig_mem_observer_t * observer2 = static_cast<sig_mem_observer_t *>(o);
+      return m_inst == observer2->m_inst
+          && m_cb == observer2->m_cb;
+    }
+
+    ~sig_mem_observer_t(){ }
+  };
+
+  sig_mem_observer_t * _observer = new sig_mem_observer_t;
+  _observer->m_inst = inst;
+  _observer->m_cb = memFn;
+
+  return _observer;
+}
+
+typedef sig_mem_observer_base_t * sig_observer_cb2_t;
+
+#define sig_slot(t, f) sig_make_mem_observer(t, f)
+
+#endif
+
+typedef void (*sig_observer_cb_t)(const sig_signal_t signal);
 
 /**
  * Attach a non-function or member-function to event
  */
 __SIG_C_DECL void sig_attach(int signal, sig_observer_cb_t cb);
-__SIG_C_DECL void sig_attachc(int signal,
-                              sig_observer_cb_t cb,
-                              const sig_context_t * ctx);
 
 #ifdef __cplusplus
 // Default context
 void sig_attach(int signal, sig_observer_cb2_t cb);
+void sig_attach(const char * signal, sig_observer_cb_t cb);
 void sig_attach(const char * signal, sig_observer_cb2_t cb);
 
 // Attach by given context
 void sig_attach(int signal,
+                sig_observer_cb_t cb,
+                const sig_context_t * ctx);
+void sig_attach(int signal,
                 sig_observer_cb2_t cb,
+                const sig_context_t * ctx);
+void sig_attach(const char * signal,
+                sig_observer_cb_t cb,
                 const sig_context_t * ctx);
 void sig_attach(const char * signal,
                 sig_observer_cb2_t cb,
                 const sig_context_t * ctx);
 #else
+__SIG_C_DECL void sig_attachc(int signal,
+                              sig_observer_cb_t cb,
+                              const sig_context_t * ctx);
 __SIG_C_DECL void sig_attach_s(const char * signal, sig_observer_cb_t cb);
 __SIG_C_DECL void sig_attachc_s(const char * signal,
                                 sig_observer_cb_t cb,

@@ -35,19 +35,28 @@ std::vector<sig_signal_req *> signals_reqs;
 std::map<CStringPtr, unsigned int, cmp_str> string_map;
 
 struct sig_signal_req {
-  typedef sig_observer_cb2_t sig_cb_t;
-  typedef unsigned int       uid_t;
-  typedef unsigned int       req_type_t;
+  typedef sig_observer_cb_t       sig_cb_t;
+  typedef sig_mem_observer_base_t sig_mem_cb_t;
+  typedef unsigned int            uid_t;
+  typedef unsigned int            req_type_t;
 
   uid_t           uid;
   req_type_t      req_type;
   sig_context_t * ctx;
   sig_cb_t        cb;
+  sig_mem_cb_t  * mem_cb;
 
   sig_signal_req(req_type_t req_type,
                  sig_context_t * ctx,
                  uid_t _uid,
-                 sig_cb_t cb);
+                 sig_cb_t _cb);
+
+  sig_signal_req(req_type_t req_type,
+                 sig_context_t * ctx,
+                 uid_t _uid,
+                 sig_mem_cb_t * _cb);
+
+  ~sig_signal_req();
 
   bool operator==(const uid_t& r1) const;
   void operator()(sig_signal_t s) const;
@@ -60,7 +69,23 @@ sig_signal_req::sig_signal_req(req_type_t _req_type,
   : req_type(_req_type),
     ctx(_ctx),
     uid(_uid),
-    cb(_cb) { }
+    cb(_cb),
+    mem_cb(NULL) { }
+
+sig_signal_req::sig_signal_req(req_type_t _req_type,
+                               sig_context_t * _ctx,
+                               uid_t _uid,
+                               sig_mem_cb_t * _cb)
+  : req_type(_req_type),
+    ctx(_ctx),
+    uid(_uid),
+    cb(NULL),
+    mem_cb(_cb) { }
+
+sig_signal_req::~sig_signal_req() {
+  if (this->mem_cb)
+    delete this->mem_cb;
+}
 
 bool
 sig::sig_signal_req::operator==(const uid_t &an_uid) const {
@@ -69,7 +94,13 @@ sig::sig_signal_req::operator==(const uid_t &an_uid) const {
 
 void
 sig::sig_signal_req::operator()(sig_signal_t s) const {
-  this->cb(s);
+  // non-member functions
+  if (this->cb)
+    this->cb(s);
+
+  // Member functions
+  if (this->mem_cb)
+    this->mem_cb->operator()(s);
 }
 
 unsigned int
@@ -193,6 +224,11 @@ sig_attach(int signal, sig_observer_cb2_t cb) {
 }
 
 void
+sig_attach(const char * signal, sig_observer_cb_t cb) {
+  sig::perform_attach(signal, cb);
+}
+
+void
 sig_attach(const char * signal, sig_observer_cb2_t cb) {
   sig::perform_attach(signal, cb);
 }
@@ -227,7 +263,21 @@ sig_attachc(int signal,
 
 void
 sig_attach(int signal,
+           sig_observer_cb_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+}
+
+void
+sig_attach(int signal,
            sig_observer_cb2_t cb,
+           const sig_context_t * ctx) {
+  sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
+}
+
+void
+sig_attach(const char * signal,
+           sig_observer_cb_t cb,
            const sig_context_t * ctx) {
   sig::perform_attach(signal, cb, const_cast<sig_context_t *>(ctx));
 }
