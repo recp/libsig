@@ -211,29 +211,76 @@ __SIG_C_DECL void sig_firec_s(const char * signal,
 #ifdef __cplusplus
 namespace sig {
 
-struct attach_stream_base_t {
-  virtual attach_stream_base_t & operator << (sig_observer_cb2_t cb) const;
-  virtual attach_stream_base_t & operator >> (sig_observer_cb2_t cb) const;
+struct attach_stream_ref {
+  struct attach_stream;
+  struct attach_stream_s;
+
+  attach_stream operator [] (int signal) const;
+  attach_stream_s operator [] (const char * signal) const;
+
+  struct attach_stream {
+    const int sig_id;
+    attach_stream(const int _sig_id) : sig_id(_sig_id) { }
+    const attach_stream& operator << (sig_observer_cb_t cb) const;
+    const attach_stream& operator << (sig_observer_cb2_t cb) const;
+  };
+
+  struct attach_stream_s {
+    const char * sig_id;
+    attach_stream_s(const char * _sig_id) : sig_id(_sig_id) { }
+    const attach_stream_s& operator << (sig_observer_cb_t cb) const;
+    const attach_stream_s& operator << (sig_observer_cb2_t cb) const;
+  };
 };
 
-struct attach_stream_signal_base_t {
-  attach_stream_base_t operator [] (const char * signal) const;
-  attach_stream_base_t operator [] (int signal) const;
+struct detach_stream_ref {
+  struct detach_stream;
+  struct detach_stream_s;
+
+  detach_stream operator [] (int signal) const;
+  detach_stream_s operator [] (const char * signal) const;
+
+  struct detach_stream {
+    const int sig_id;
+    detach_stream(const int _sig_id) : sig_id(_sig_id) { }
+    const detach_stream& operator >> (sig_observer_cb_t cb) const;
+    const detach_stream& operator >> (sig_observer_cb2_t cb) const;
+  };
+
+  struct detach_stream_s {
+    const char * sig_id;
+    detach_stream_s(const char * _sig_id) : sig_id(_sig_id) { }
+    const detach_stream_s& operator >> (sig_observer_cb_t cb) const;
+    const detach_stream_s& operator >> (sig_observer_cb2_t cb) const;
+  };
 };
 
-struct fire_stream_base_t {
-  fire_stream_base_t & operator << (void * object) const;
+struct fire_stream_ref {
+  struct fire_stream;
+  struct fire_stream_s;
+
+  fire_stream operator [] (int signal) const;
+  fire_stream_s operator [] (const char * signal) const;
+
+  struct fire_stream {
+    const int sig_id;
+    fire_stream(const int _sig_id) : sig_id(_sig_id) { }
+    const fire_stream& operator << (void * object) const;
+  };
+
+  struct fire_stream_s {
+    const char * sig_id;
+    fire_stream_s(const char * _sig_id) : sig_id(_sig_id) { }
+    const fire_stream_s& operator << (void * object) const;
+  };
 };
 
-struct fire_stream_signal_base_t {
-  fire_stream_base_t operator [] (const char * signal) const;
-  fire_stream_base_t operator [] (int signal) const;
-};
-
-extern attach_stream_signal_base_t attach;
-extern fire_stream_base_t fire;
+extern attach_stream_ref attach;
+extern detach_stream_ref detach;
+extern fire_stream_ref   fire;
 
 }; // namespace sig
+
 #endif
 
 #endif /* defined(__libsig__signal__h_) */

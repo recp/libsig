@@ -630,3 +630,107 @@ sig_detach(const char * signal,
            const sig_context_t * ctx) {
   sig::perform_detach_memfn2(observer, signal, ctx);
 }
+
+//
+
+namespace sig {
+
+attach_stream_ref::attach_stream
+attach_stream_ref::operator [] (int signal) const {
+  return attach_stream(signal);
+}
+
+attach_stream_ref::attach_stream_s
+attach_stream_ref::operator [] (const char * signal) const {
+  return attach_stream_s(signal);
+}
+
+const attach_stream_ref::attach_stream&
+attach_stream_ref::attach_stream::operator << (sig_observer_cb_t cb) const {
+  sig::perform_attach(this->sig_id, cb);
+  return (const attach_stream&)*this;
+}
+
+const attach_stream_ref::attach_stream&
+attach_stream_ref::attach_stream::operator << (sig_observer_cb2_t cb) const {
+  sig::perform_attach(this->sig_id, cb);
+  return (const attach_stream&)*this;
+}
+
+const attach_stream_ref::attach_stream_s&
+attach_stream_ref::attach_stream_s::operator << (sig_observer_cb_t cb) const {
+  sig::perform_attach(this->sig_id, cb);
+  return (const attach_stream_s&)*this;
+}
+
+const attach_stream_ref::attach_stream_s&
+attach_stream_ref::attach_stream_s::operator << (sig_observer_cb2_t cb) const {
+  sig::perform_attach(this->sig_id, cb);
+  return (const attach_stream_s&)*this;
+}
+
+//
+
+detach_stream_ref::detach_stream
+detach_stream_ref::operator [] (int signal) const {
+  return detach_stream(signal);
+}
+
+detach_stream_ref::detach_stream_s
+detach_stream_ref::operator [] (const char * signal) const {
+  return detach_stream_s(signal);
+}
+
+const detach_stream_ref::detach_stream&
+detach_stream_ref::detach_stream::operator >> (sig_observer_cb_t cb) const {
+  sig::perform_detach(this->sig_id, cb);
+  return (const detach_stream&)*this;
+}
+
+const detach_stream_ref::detach_stream&
+detach_stream_ref::detach_stream::operator >> (sig_observer_cb2_t cb) const {
+  sig::perform_detach(this->sig_id, cb);
+  return (const detach_stream&)*this;
+}
+
+const detach_stream_ref::detach_stream_s&
+detach_stream_ref::detach_stream_s::operator >> (sig_observer_cb_t cb) const {
+  sig::perform_detach(this->sig_id, cb);
+  return (const detach_stream_s&)*this;
+}
+
+const detach_stream_ref::detach_stream_s&
+detach_stream_ref::detach_stream_s::operator >> (sig_observer_cb2_t cb) const {
+  sig::perform_detach(this->sig_id, cb);
+  return (const detach_stream_s&)*this;
+}
+
+//
+
+fire_stream_ref::fire_stream
+fire_stream_ref::operator [] (int signal) const {
+  return fire_stream(signal);
+}
+
+fire_stream_ref::fire_stream_s
+fire_stream_ref::operator [] (const char * signal) const {
+  return fire_stream_s(signal);
+}
+
+const fire_stream_ref::fire_stream&
+fire_stream_ref::fire_stream::operator << (void * object) const {
+  sig::perform_fire(this->sig_id, object);
+  return (const fire_stream&)*this;
+}
+
+const fire_stream_ref::fire_stream_s&
+fire_stream_ref::fire_stream_s::operator << (void * object) const {
+  sig::perform_fire(this->sig_id, object);
+  return (const fire_stream_s&)*this;
+}
+
+attach_stream_ref attach;
+detach_stream_ref detach;
+fire_stream_ref   fire;
+
+} // namespace sig
