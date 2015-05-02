@@ -14,12 +14,22 @@
 #  define __SIG_C_DECL
 #endif
 
+#if defined(_WIN32)
+#  ifdef _libsig_dll
+#    define _libsig_export __declspec(dllexport)
+#  else
+#    define _libsig_export __declspec(dllimport)
+#  endif
+#else
+#  define _libsig_export __attribute__((visibility("default")))
+#endif
+
 typedef const void * const sig_signal_id_t;
 typedef void * sig_signal_object_t;
 typedef struct sig_signal_s sig_signal_t;
 typedef struct sig_context_s sig_context_t;
 
-struct sig_context_s {
+struct _libsig_export sig_context_s {
   const int ctx_id;
   int status;
 #ifdef __cplusplus
@@ -27,14 +37,14 @@ struct sig_context_s {
 #endif
 };
 
-__SIG_C_DECL const sig_context_t * sig_ctx_new();
-__SIG_C_DECL void sig_ctx_free(const sig_context_t * ctx);
+__SIG_C_DECL _libsig_export const sig_context_t * sig_ctx_new();
+__SIG_C_DECL _libsig_export void sig_ctx_free(const sig_context_t * ctx);
 
 /* Predefined signal contexts */
-__SIG_C_DECL const sig_context_t * sig_ctx_default();
-__SIG_C_DECL const sig_context_t * sig_ctx_sys();
+__SIG_C_DECL _libsig_export const sig_context_t * sig_ctx_default();
+__SIG_C_DECL _libsig_export const sig_context_t * sig_ctx_sys();
 
-struct sig_signal_s {
+struct _libsig_export sig_signal_s {
   sig_signal_id_t signal_id;
   sig_signal_object_t object;
   const sig_context_t * context;
@@ -53,7 +63,7 @@ struct sig_signal_s {
 #define SIG_STATUS_FAILURE 1
 
 #ifdef __cplusplus
-struct sig_mem_observer_base_t {
+struct _libsig_export sig_mem_observer_base_t {
   virtual void operator()(const sig_signal_t signal) const = 0;
   virtual bool operator==(sig_mem_observer_base_t * o) const = 0;
   virtual void * get_obj_addr() const = 0;
@@ -61,6 +71,7 @@ struct sig_mem_observer_base_t {
 };
 
 template <typename T>
+_libsig_export
 sig_mem_observer_base_t *
 sig_make_mem_observer(T * inst, void (T::*memFn)(const sig_signal_t signal)) {
   struct sig_mem_observer_t : public sig_mem_observer_base_t {
@@ -102,116 +113,156 @@ typedef void (*sig_observer_cb_t)(const sig_signal_t signal);
 /**
  * Attach a non-function or member-function to event
  */
-__SIG_C_DECL void sig_attach(int signal, sig_observer_cb_t cb);
+__SIG_C_DECL _libsig_export void sig_attach(int signal, sig_observer_cb_t cb);
 
 #ifdef __cplusplus
 // Default context
-void sig_attach(int signal, sig_observer_cb2_t cb);
-void sig_attach(const char * signal, sig_observer_cb_t cb);
-void sig_attach(const char * signal, sig_observer_cb2_t cb);
+_libsig_export void sig_attach(int signal, sig_observer_cb2_t cb);
+_libsig_export void sig_attach(const char * signal, sig_observer_cb_t cb);
+_libsig_export void sig_attach(const char * signal, sig_observer_cb2_t cb);
 
 // Attach by given context
-void sig_attach(int signal,
-                sig_observer_cb_t cb,
-                const sig_context_t * ctx);
-void sig_attach(int signal,
-                sig_observer_cb2_t cb,
-                const sig_context_t * ctx);
-void sig_attach(const char * signal,
-                sig_observer_cb_t cb,
-                const sig_context_t * ctx);
-void sig_attach(const char * signal,
-                sig_observer_cb2_t cb,
-                const sig_context_t * ctx);
+_libsig_export void
+sig_attach(int signal,
+           sig_observer_cb_t cb,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_attach(int signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_attach(const char * signal,
+           sig_observer_cb_t cb,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_attach(const char * signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx);
+
 #else
-__SIG_C_DECL void sig_attachc(int signal,
-                              sig_observer_cb_t cb,
-                              const sig_context_t * ctx);
-__SIG_C_DECL void sig_attach_s(const char * signal, sig_observer_cb_t cb);
-__SIG_C_DECL void sig_attachc_s(const char * signal,
-                                sig_observer_cb_t cb,
-                                const sig_context_t * ctx);
+__SIG_C_DECL _libsig_export void
+sig_attachc(int signal,
+            sig_observer_cb_t cb,
+            const sig_context_t * ctx);
+
+__SIG_C_DECL _libsig_export void
+sig_attach_s(const char * signal, sig_observer_cb_t cb);
+
+__SIG_C_DECL _libsig_export void
+sig_attachc_s(const char * signal,
+              sig_observer_cb_t cb,
+              const sig_context_t * ctx);
 #endif
 
 /**
  * Detach a non-function or member-function to event
  */
-__SIG_C_DECL void sig_detach(int signal, sig_observer_cb_t cb);
+__SIG_C_DECL _libsig_export void sig_detach(int signal, sig_observer_cb_t cb);
 
 #ifdef __cplusplus
 
 // Default context
-void sig_detach(int signal, sig_observer_cb2_t cb);
-void sig_detach(const char * signal, sig_observer_cb_t cb);
-void sig_detach(const char * signal, sig_observer_cb2_t cb);
+_libsig_export void sig_detach(int signal, sig_observer_cb2_t cb);
+_libsig_export void sig_detach(const char * signal, sig_observer_cb_t cb);
+_libsig_export void sig_detach(const char * signal, sig_observer_cb2_t cb);
 
 // Default by given context
-void sig_detach(int signal,
-                sig_observer_cb_t cb,
-                const sig_context_t * ctx);
-void sig_detach(int signal,
-                sig_observer_cb2_t cb,
-                const sig_context_t * ctx);
-void sig_detach(const char * signal,
-                sig_observer_cb2_t cb,
-                const sig_context_t * ctx);
-void sig_detach(const char * signal,
-                sig_observer_cb2_t cb,
-                const sig_context_t * ctx);
+_libsig_export void
+sig_detach(int signal,
+           sig_observer_cb_t cb,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_detach(int signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_detach(const char * signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_detach(const char * signal,
+           sig_observer_cb2_t cb,
+           const sig_context_t * ctx);
 
 // Detach all observer from the object/instance
 // This can be useful when the object will be free-ing
-void sig_detach(void * observer);
-void sig_detach(void * observer,
-                const sig_context_t * ctx);
+_libsig_export void sig_detach(void * observer);
+
+_libsig_export void
+sig_detach(void * observer,
+           const sig_context_t * ctx);
 
 // Detach all observers by given signal from the object/instance
-void sig_detach(int signal, void * observer);
-void sig_detach(const char * signal, void * observer);
-void sig_detach(int signal,
-                void * observer,
-                const sig_context_t * ctx);
-void sig_detach(int signal,
-                void * observer,
-                const sig_context_t * ctx);
+_libsig_export void sig_detach(int signal, void * observer);
+_libsig_export void sig_detach(const char * signal, void * observer);
+
+_libsig_export void
+sig_detach(int signal,
+           void * observer,
+           const sig_context_t * ctx);
+
+_libsig_export void
+sig_detach(int signal,
+           void * observer,
+           const sig_context_t * ctx);
 
 #else
-__SIG_C_DECL void sig_detachc(int signal,
-                              sig_observer_cb_t cb,
-                              const sig_context_t * ctx);
-__SIG_C_DECL void sig_detach_s(const char * signal, sig_observer_cb_t cb);
-__SIG_C_DECL void sig_detachc_s(int signal,
-                                sig_observer_cb_t cb,
-                                const sig_context_t * ctx);
+__SIG_C_DECL _libsig_export void
+sig_detachc(int signal,
+            sig_observer_cb_t cb,
+            const sig_context_t * ctx);
+
+__SIG_C_DECL _libsig_export void
+sig_detach_s(const char * signal, sig_observer_cb_t cb);
+
+__SIG_C_DECL _libsig_export void
+sig_detachc_s(int signal,
+              sig_observer_cb_t cb,
+              const sig_context_t * ctx);
 #endif
 
 /**
  * Fire an event by given name and object
  */
-__SIG_C_DECL void sig_fire(int signal, void * object);
+__SIG_C_DECL _libsig_export void sig_fire(int signal, void * object);
 
 #ifdef __cplusplus
-void sig_fire(const char * signal, void * object);
-void sig_fire(int signal,
-              void * object,
-              const sig_context_t * ctx);
-void sig_fire(const char * signal,
-              void * object,
-              const sig_context_t * ctx);
+_libsig_export void sig_fire(const char * signal, void * object);
+
+_libsig_export void
+sig_fire(int signal,
+         void * object,
+         const sig_context_t * ctx);
+
+_libsig_export void
+sig_fire(const char * signal,
+         void * object,
+         const sig_context_t * ctx);
 #else
-__SIG_C_DECL void sig_firec(int signal,
-                            void * object,
-                            const sig_context_t * ctx);
-__SIG_C_DECL void sig_fire_s(const char * signal, void * object);
-__SIG_C_DECL void sig_firec_s(const char * signal,
-                              void * object,
-                              const sig_context_t * ctx);
+__SIG_C_DECL _libsig_export
+void sig_firec(int signal,
+               void * object,
+               const sig_context_t * ctx);
+
+__SIG_C_DECL _libsig_export void
+sig_fire_s(const char * signal, void * object);
+
+__SIG_C_DECL _libsig_export void
+sig_firec_s(const char * signal,
+            void * object,
+            const sig_context_t * ctx);
 #endif
 
 #ifdef __cplusplus
 namespace sig {
 
-struct attach_stream_ref {
+struct _libsig_export attach_stream_ref {
   struct attach_stream;
   struct attach_stream_s;
 
@@ -233,7 +284,7 @@ struct attach_stream_ref {
   };
 };
 
-struct detach_stream_ref {
+struct _libsig_export detach_stream_ref {
   struct detach_stream;
   struct detach_stream_s;
 
@@ -255,7 +306,7 @@ struct detach_stream_ref {
   };
 };
 
-struct fire_stream_ref {
+struct _libsig_export fire_stream_ref {
   struct fire_stream;
   struct fire_stream_s;
 
@@ -275,9 +326,9 @@ struct fire_stream_ref {
   };
 };
 
-extern attach_stream_ref attach;
-extern detach_stream_ref detach;
-extern fire_stream_ref   fire;
+extern _libsig_export attach_stream_ref attach;
+extern _libsig_export detach_stream_ref detach;
+extern _libsig_export fire_stream_ref   fire;
 
 }; // namespace sig
 

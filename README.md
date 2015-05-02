@@ -16,7 +16,7 @@ Also the system signals such as SIGPIPE... can be observed in system context
 
 Predefined contexts:
 ```C
-// sig_attach/sig_detach/sig_fire functions 
+// sig_attach/sig_detach/sig_fire functions
 // use the default ctx if there is no specified one
 const sig_context_t * sig_ctx_default();
 
@@ -33,9 +33,9 @@ void sig_ctx_free(const sig_context_t * ctx);
 ####For C:####
 The functions are overloaded by `_s` postfix (and `c` postfix for custom contexts):
 ```C
-/* 
-  For all (or full) declerations (especially for custom ctx) 
-  look at the sig.h header 
+/*
+  For all (or full) declerations (especially for custom ctx)
+  look at the sig.h header
  */
 
 /* Observe a signal by signal name or id */
@@ -53,9 +53,9 @@ void sig_fire_s(const char * signal, void * object);
 
 ####For C++:####
 ```C++
-/* 
-  For all (or full) declerations (especially for custom ctx) 
-  look at the sig.h header 
+/*
+  For all (or full) declerations (especially for custom ctx)
+  look at the sig.h header
  */
 
 /* Observe a signal by signal name or id */
@@ -104,7 +104,7 @@ sig:fire["signal_name"] << (void *)"Signal object (void *)";
 
 ## Build
 
-### Unix / Macintosh 
+### Unix / Macintosh
 
 ```text
 $ sh autogen.sh
@@ -116,7 +116,7 @@ $ [sudo] make install
 ### Windows
 
 ```text
-TODO
+$ msbuild libsig.vcxproj /p:Configuration=Release
 ```
 
 ###Sample###
