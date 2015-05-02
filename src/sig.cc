@@ -10,6 +10,12 @@
 #include <vector>
 #include <map>
 #include <string.h>
+#include <sys/signal.h>
+
+enum sig_reserved_context_id {
+  kSigReservedContextId_Default = 0,
+  kSigReservedContextId_Sys     = 1
+};
 
 namespace sig {
 
@@ -24,6 +30,8 @@ struct sig_signal_req;
 
 unsigned int s_last_sig_id = 1;
 unsigned int s_sig_context_last_id = 1000;
+
+void sys_sig_observer(int signum);
 
 struct cmp_str {
   bool operator()(char const *a, char const *b) const {
@@ -127,6 +135,11 @@ perform_attach(int signal,
   sig::sig_signal_req * sig_req =
        new sig::sig_signal_req(SIG_REQ_TYPE_INT, ctx, signal, cb);
   sig::signals_reqs.push_back(sig_req);
+
+  if (ctx == sig_ctx_sys()
+     && ctx->ctx_id == kSigReservedContextId_Sys) {
+    ::signal(signal, sig::sys_sig_observer);
+  }
 }
 
 template <typename _FuncType>
@@ -135,6 +148,11 @@ perform_attach(CStringPtr signal,
                _FuncType cb,
                const sig_context_t * ctx = sig_def_ctx) {
   if (ctx->status == 1)
+    return;
+
+  // system signals only accepts integer as signal num
+  if (ctx == sig_ctx_sys()
+     && ctx->ctx_id == kSigReservedContextId_Sys)
     return;
 
   unsigned int signal_uid = get_mapped_uid(signal);
@@ -338,16 +356,18 @@ perform_fire(CStringPtr signal,
   }
 }
 
+void
+sys_sig_observer(int signum) {
+  const sig_context_t * ctx = sig_ctx_sys();
+
+  void * object = (void *)&signum;
+  sig::perform_fire(signum, object, ctx);
+}
+
 } // namespace sig
 
 sig_context_s::sig_context_s(int id)
   : ctx_id(id) { }
-
-enum sig_reserved_context_id {
-  kSigReservedContextId_Default = 0,
-  kSigReservedContextId_Sys     = 1
-};
-
 
 __SIG_C_DECL const sig_context_t *
 sig_ctx_default() {
