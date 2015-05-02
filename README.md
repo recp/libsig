@@ -132,29 +132,29 @@ class TestClass {
 public:
   TestClass() {
     sig_attach(CUSTOM_NTF1,
-               sig_slot(this, &MyClass::memberFn));
+               sig_slot(this, &TestClass::memberFn));
 
     sig_attach("custom_ntf2",
-               sig_slot(this, &MyClass::memberFn));
+               sig_slot(this, &TestClass::memberFn));
 
     // Attach / Observe system signals
     sig_attach(SIGUSR1,
-               sig_slot(this, &MyClass::memberFn),
+               sig_slot(this, &TestClass::memberFn),
                sig_ctx_sys());
   }
 
   void memberFn(const sig_signal_t sig) {
-  
+
     // Do somethings...
-    
-    std::cout << "Notification object: " 
-              << (const char *)sig.object 
+
+    std::cout << "notification (TestClass): "
+              << (const char *)sig.object
               << std::endl;
   }
 
   void stopObserveNtf1() {
-    sig_detach(CUSTOM_NTF1, 
-               sig_slot(this, &MyClass::memberFn));
+    sig_detach(CUSTOM_NTF1,
+               sig_slot(this, &TestClass::memberFn));
   }
 
   ~TestClass() {
@@ -163,39 +163,40 @@ public:
 };
 
 // non-member function
-void do_somethings(const sig_signal_t * const signal) {
-	fprintf(stderr, "%s", (const char *)signal->object);
+void do_somethings(const sig_signal_t signal) {
+    std::cout << "notification (do_somethings): "
+              << (const char *)signal.object
+              << std::endl;
 }
 
 int main() {
-  // -------------------------------------------------------
-  
+
   // Observe a signal/event
   sig_attach("signal-1", do_somethings);
-  // Or
-  sig::attach["signal-1"] << do_somethings;
 
   // Fire signal
-  sig_fire("signal-1", (void *)"Hello World!");
-  // Or
-  sig::fire["signal-1"] << (void *)"Hello World!" << ...;
+  sig_fire("signal-1", (void *)"signal-1 object");
 
-  // -------------------------------------------------------
-  
+
   // Test Member functions
 
   TestClass t1;
 
-  sig_fire(CUSTOM_NTF1, (void *)" ntf 1");
+  sig_fire(CUSTOM_NTF1, (void *)"ntf 1 object");
   t1.stopObserveNtf1();
-  sig_fire(CUSTOM_NTF1, (void *)" ntf 1");
+  sig_fire(CUSTOM_NTF1, (void *)"ntf 1 object");
 
-  sig_fire("custom_ntf2", (void *)" ntf 2");
+  sig_fire("custom_ntf2", (void *)"ntf 2 object");
 
   raise(SIGUSR1);
-  
-  // -------------------------------------------------------
 
   return 0;
 }
+```
+Output:
+```text
+notification (do_somethings): signal-1 object
+notification (TestClass): ntf 1 object
+notification (TestClass): ntf 2 object
+notification (TestClass): 
 ```
