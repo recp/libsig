@@ -8,6 +8,7 @@
 *.opensdf
 ipch/
 Debug/
+Release/
 .DS_Store
 /aclocal.m4
 /ar-lib
