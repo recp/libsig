@@ -122,26 +122,79 @@ $ msbuild libsig.vcxproj /p:Configuration=Release
 ###Sample###
 
 ```C++
+#include <iostream>
+#include <signal.h>
 #include <sig.h>
 
+#define CUSTOM_NTF1 123
+
+class TestClass {
+public:
+  TestClass() {
+    sig_attach(CUSTOM_NTF1,
+               sig_slot(this, &MyClass::memberFn));
+
+    sig_attach("custom_ntf2",
+               sig_slot(this, &MyClass::memberFn));
+
+    // Attach / Observe system signals
+    sig_attach(SIGUSR1,
+               sig_slot(this, &MyClass::memberFn),
+               sig_ctx_sys());
+  }
+
+  void memberFn(const sig_signal_t sig) {
+  
+    // Do somethings...
+    
+    std::cout << "Notification object: " 
+              << (const char *)sig.object 
+              << std::endl;
+  }
+
+  void stopObserveNtf1() {
+    sig_detach(CUSTOM_NTF1, 
+               sig_slot(this, &MyClass::memberFn));
+  }
+
+  ~TestClass() {
+    sig_detach(this);
+  }
+};
+
+// non-member function
 void do_somethings(const sig_signal_t * const signal) {
 	fprintf(stderr, "%s", (const char *)signal->object);
 }
 
-int main(int argc, const char * argv[]) {
+int main() {
+  // -------------------------------------------------------
+  
   // Observe a signal/event
   sig_attach("signal-1", do_somethings);
-
   // Or
   sig::attach["signal-1"] << do_somethings;
 
-  // -------------------------------------------------------
-
   // Fire signal
   sig_fire("signal-1", (void *)"Hello World!");
-
   // Or
   sig::fire["signal-1"] << (void *)"Hello World!" << ...;
+
+  // -------------------------------------------------------
+  
+  // Test Member functions
+
+  TestClass t1;
+
+  sig_fire(CUSTOM_NTF1, (void *)" ntf 1");
+  t1.stopObserveNtf1();
+  sig_fire(CUSTOM_NTF1, (void *)" ntf 1");
+
+  sig_fire("custom_ntf2", (void *)" ntf 2");
+
+  raise(SIGUSR1);
+  
+  // -------------------------------------------------------
 
   return 0;
 }
