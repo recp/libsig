@@ -259,6 +259,26 @@ perform_detach(CStringPtr signal,
 }
 
 void
+perform_detach_all_memfn(void * observer,
+                         const sig_context_t * ctx = NULL) {
+  std::vector<sig_signal_req *>::iterator it = sig::signals_reqs.begin();
+  for (; it != sig::signals_reqs.end(); it++) {
+    sig_signal_req * sig_req = *it;
+    if (!sig_req->mem_cb)
+      continue;
+
+    if (sig_req->mem_cb->get_obj_addr() == observer
+        && (ctx == NULL || sig_req->ctx->ctx_id == ctx->ctx_id)) {
+
+      // free resources
+      delete sig_req;
+      sig::signals_reqs.erase(it);
+      it--;
+    }
+  }
+}
+
+void
 perform_detach_memfn(void * observer,
                      int signal = 0,
                      const sig_context_t * ctx = NULL) {
@@ -498,7 +518,7 @@ sig_detach_s(const char * signal, sig_observer_cb_t cb) {
 
 void
 sig_detach(void * observer) {
-  sig::perform_detach_memfn(observer);
+  sig::perform_detach_all_memfn(observer);
 }
 
 void
@@ -634,7 +654,7 @@ sig_detachc_s(int signal,
 void
 sig_detach(void * observer,
            const sig_context_t * ctx) {
-  sig::perform_detach_memfn(observer, 0, ctx);
+  sig::perform_detach_all_memfn(observer, ctx);
 }
 
 void 
